@@ -14,15 +14,20 @@ const CartItem = ({ onContinueShopping }) => {
       .toFixed(2);
   };
 
-  // Return early if cart is empty
+  // Early return if cart is empty
   if (cart.length === 0) {
     return (
       <div className="cart-container">
         <h2>Your cart is empty.</h2>
-        <button className="get-started-button" onClick={(e) => {
-          e.preventDefault();
-          onContinueShopping();
-        }}>Continue Shopping</button>
+        <button
+          className="get-started-button"
+          onClick={(e) => {
+            e.preventDefault();
+            onContinueShopping();
+          }}
+        >
+          Continue Shopping
+        </button>
       </div>
     );
   }
@@ -40,12 +45,12 @@ const CartItem = ({ onContinueShopping }) => {
     if (item.quantity > 1) {
       dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
     } else {
-      dispatch(removeItem({ name: item.name }));
+      dispatch(removeItem(item.name)); // <- fixed to dispatch string instead of object
     }
   };
 
   const handleRemove = (item) => {
-    dispatch(removeItem({ name: item.name }));
+    dispatch(removeItem(item.name)); // <- fixed to dispatch string instead of object
   };
 
   // Calculate total cost based on quantity for an item
@@ -95,7 +100,9 @@ const CartItem = ({ onContinueShopping }) => {
       </div>
 
       <div className="continue_shopping_btn" style={{ marginTop: '20px', color: 'black' }}>
-        <button className="get-started-button" onClick={handleContinueShopping}>Continue Shopping</button>
+        <button className="get-started-button" onClick={handleContinueShopping}>
+          Continue Shopping
+        </button>
         <br />
         <button
           className="get-started-button1"

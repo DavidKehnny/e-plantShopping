@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItem } from './CartSlice';
 import './ProductList.css';
 import CartItem from './CartItem';
 
 function ProductList({ onHomeClick }) {
+  const dispatch = useDispatch();
+  const cartItems = useSelector(state => state.cart.items);
+
   const [showCart, setShowCart] = useState(false);
-  const [addedToCart, setAddedToCart] = useState({}); // Track added plants by name
+  const [addedToCart, setAddedToCart] = useState({}); // Track added plants by name for UI feedback
 
   const plantsArray = [
     {
@@ -22,7 +27,6 @@ function ProductList({ onHomeClick }) {
           description: "Filters formaldehyde and xylene from the air.",
           cost: "$12"
         }
-        // Add more as needed...
       ]
     },
     {
@@ -34,10 +38,8 @@ function ProductList({ onHomeClick }) {
           description: "Calming scent, used in aromatherapy.",
           cost: "$20"
         }
-        // Add more as needed...
       ]
     }
-    // Add more categories...
   ];
 
   const styleObj = {
@@ -46,7 +48,7 @@ function ProductList({ onHomeClick }) {
     padding: '15px',
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center', // fixed typo here
+    alignItems: 'center',
     fontSize: '20px',
   };
 
@@ -78,12 +80,15 @@ function ProductList({ onHomeClick }) {
     setShowCart(false);
   };
 
-  // Added this function for Add to Cart button
-  const handleAddToCart = (plant) => {
-    // TODO: Dispatch addItem action here if using Redux
-    console.log('Add to cart:', plant.name);
+  // Calculate total quantity of all items in cart
+  const calculateTotalQuantity = () => {
+    return cartItems ? cartItems.reduce((total, item) => total + item.quantity, 0) : 0;
+  };
 
-    // Mark this plant as added to cart (for UI feedback)
+  const handleAddToCart = (plant) => {
+    dispatch(addItem(plant)); // Dispatch addItem action to Redux store
+
+    // Mark this plant as added to cart (for UI button disable and label change)
     setAddedToCart((prev) => ({
       ...prev,
       [plant.name]: true,
@@ -125,6 +130,7 @@ function ProductList({ onHomeClick }) {
           </div>
           <div>
             <a href="#" onClick={handleCartClick} style={styleA}>
+              {/* Cart icon with total quantity badge */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 256 256"
@@ -142,6 +148,22 @@ function ProductList({ onHomeClick }) {
                   strokeWidth="2"
                 />
               </svg>
+              {calculateTotalQuantity() > 0 && (
+                <span
+                  style={{
+                    backgroundColor: 'red',
+                    color: 'white',
+                    borderRadius: '50%',
+                    padding: '2px 8px',
+                    position: 'relative',
+                    left: '-10px',
+                    top: '-10px',
+                    fontSize: '14px',
+                  }}
+                >
+                  {calculateTotalQuantity()}
+                </span>
+              )}
             </a>
           </div>
         </div>
